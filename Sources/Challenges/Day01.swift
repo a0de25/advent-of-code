@@ -1,7 +1,7 @@
 struct Day01: Puzzle {
     let input: PuzzleInput
 
-    func part01() async throws {
+    func part01() async throws -> Int {
         let pairs: [(Int, Int)] = input.part1
             .split(separator: "\n")
             .map { str in
@@ -17,16 +17,14 @@ struct Day01: Puzzle {
             sortedPairs.append((firstColumnSorted[index], secondColumnSorted[index]))
         }
 
-        let result: Int = sortedPairs
+        return sortedPairs
             .reduce(0) { result, nextValue in
                 let current = nextValue.0.distance(to: nextValue.1)
                 return result + abs(current)
             }
-
-        print(result)
     }
 
-    func part02() async throws {
+    func part02() async throws -> Int {
         let pairs: [(Int, Int)] = input.part2
             .split(separator: "\n")
             .map { str in
@@ -42,8 +40,6 @@ struct Day01: Puzzle {
             return value * occurences
         }
 
-        let result = similarityScores.reduce(0, +)
-
-        print(result)
+        return similarityScores.reduce(0, +)
     }
 }
