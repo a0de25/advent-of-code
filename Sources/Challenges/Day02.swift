@@ -21,13 +21,23 @@ struct Day02: Puzzle {
     }
 
     func part02() async throws -> Int {
-        return 0
+        let reports: [[Int]] = input.part2
+            .split { $0.isNewline }
+            .map { line in
+                line
+                    .split { $0.isWhitespace }
+                    .map { Int($0)! }
+            }
+        return reports.reduce(0) { result, report in
+            if report.isSortedIncreasingAllowingOneBadValue() || report.isSortedDecreasingAllowingOneBadValue() {
+                return result + 1
+            }
+            return result
+        }
     }
 }
 
 extension Array where Element == Int {
-//        The levels are either all increasing or all decreasing.
-//        Any two adjacent levels differ by at least one and at most three.
     func isSortedIncreasing() -> Bool {
         var previous: Int?
         for element in self {
@@ -56,5 +66,55 @@ extension Array where Element == Int {
             previous = element
         }
         return true
+    }
+
+    func isSortedIncreasingAllowingOneBadValue(failOnBadValue: Bool = false) -> Bool {
+        for (index, _) in enumerated() {
+            if index == endIndex - 1 {
+                return true
+            }
+
+            let current = self[index]
+            let nextIndex = index + 1
+            let next = self[nextIndex]
+
+            if (1...3).contains(current.distance(to: next)) {
+                continue
+            } else if failOnBadValue {
+                return false
+            } else {
+                var bar = self
+                bar.remove(at: index)
+                var baz = self
+                baz.remove(at: nextIndex)
+                return bar.isSortedIncreasingAllowingOneBadValue(failOnBadValue: true) || baz.isSortedIncreasingAllowingOneBadValue(failOnBadValue: true)
+            }
+
+        }
+        return false
+    }
+
+    func isSortedDecreasingAllowingOneBadValue(failOnBadValue: Bool = false) -> Bool {
+        for (index, _) in enumerated() {
+            if index == endIndex - 1 {
+                return true
+            }
+
+            let current = self[index]
+            let nextIndex = index + 1
+            let next = self[nextIndex]
+            if (1...3).contains(next.distance(to: current)) {
+                continue
+            } else if failOnBadValue {
+                return false
+            } else {
+                var bar = self
+                bar.remove(at: index)
+                var baz = self
+                baz.remove(at: nextIndex)
+                return bar.isSortedDecreasingAllowingOneBadValue(failOnBadValue: true) || baz.isSortedDecreasingAllowingOneBadValue(failOnBadValue: true)
+            }
+        }
+        return false
     }
 }
